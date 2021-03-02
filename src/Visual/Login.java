@@ -150,7 +150,7 @@ public class Login extends javax.swing.JFrame {
         if(resultado){
             JOptionPane.showMessageDialog(this, "Bienvenido "+nombre);
             this.dispose();
-            new RegistroEmpleados().setVisible(true);
+            new AdminOpciones().setVisible(true);
         }else{
             JOptionPane.showMessageDialog(this, "Datos incorrectos");
         }
