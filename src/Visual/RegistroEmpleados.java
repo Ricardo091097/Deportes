@@ -347,7 +347,6 @@ public class RegistroEmpleados extends javax.swing.JFrame {
         seccion = (radFem.isSelected())?'F':'M';
         emp.setSexo(seccion);
         emp.setPuesto(cmbPuesto.getSelectedItem().toString());
-        
         List<Empleados> lista = empCon.findEmpleadosEntities();
         empCon.create(emp);
         if(empCon.equals(lista)){
