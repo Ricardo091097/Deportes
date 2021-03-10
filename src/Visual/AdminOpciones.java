@@ -11,6 +11,7 @@ import Controladores.exceptions.IllegalOrphanException;
 import Controladores.exceptions.NonexistentEntityException;
 import Entidades.Empleados;
 import Entidades.Productos;
+import Entidades.Usuarios;
 import Visual.RegistroEmpleados;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -32,16 +33,9 @@ public class AdminOpciones extends javax.swing.JFrame {
     private final Empleados emp = new Empleados();
     private final ProductosJpaController mercanciaCon = new ProductosJpaController();
     
-    public DefaultTableModel cargarTabla (JTable tabla){
+    public DefaultTableModel cargarTablaEmpleados (JTable tabla){
         
-        jtEmpleados.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-                "ID", "Nombre", "Fecha", "Puesto", "Sexo"
-            }
-        ));
+        limpiarTablaEmpleados();
         
         EmpleadosJpaController empleado = new EmpleadosJpaController();
         DefaultTableModel model = (DefaultTableModel) tabla.getModel();
@@ -74,10 +68,36 @@ public class AdminOpciones extends javax.swing.JFrame {
 	
 
         model.addRow(datosRegistro);
-
+        
         }
 
 	return model;
+        
+    }
+    
+    public void limpiarTablaEmpleados(){
+        
+        jtEmpleados.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "Nombre", "Fecha", "Puesto", "Sexo"
+            }
+        ));
+        
+    }
+    
+    public void limpiarTablaUsuarios(){
+        
+        jtUsuarios.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID de empleado", "Nombre de empleado", "Contraseña", "ID de usuario", "Nivel de acceso"
+            }
+        ));
         
     }
     
@@ -95,7 +115,7 @@ public class AdminOpciones extends javax.swing.JFrame {
     
     public AdminOpciones() {
         initComponents();
-        cargarTabla(jtEmpleados);
+        cargarTablaEmpleados(jtEmpleados);
     }
 
     /**
@@ -160,6 +180,7 @@ public class AdminOpciones extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setPreferredSize(new java.awt.Dimension(670, 570));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jpUsuarios.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -477,7 +498,7 @@ public class AdminOpciones extends javax.swing.JFrame {
         }else{
             JOptionPane.showMessageDialog(this, "Empleado añadido exitosamente");
             limpiar();
-            cargarTabla(jtEmpleados);
+            cargarTablaEmpleados(jtEmpleados);
         }
 
     }//GEN-LAST:event_btnAnadirActionPerformed
@@ -530,7 +551,7 @@ public class AdminOpciones extends javax.swing.JFrame {
         }else{
             JOptionPane.showMessageDialog(this, "Empleado editado exitosamente");
             limpiar();
-            cargarTabla(jtEmpleados);
+            cargarTablaEmpleados(jtEmpleados);
         }
     }//GEN-LAST:event_btnEditarActionPerformed
 
@@ -551,7 +572,7 @@ public class AdminOpciones extends javax.swing.JFrame {
         }else{
             JOptionPane.showMessageDialog(this, "Empleado eliminado exitosamente");
             limpiar();
-            cargarTabla(jtEmpleados);
+            cargarTablaEmpleados(jtEmpleados);
         }
     }//GEN-LAST:event_btnEliminarActionPerformed
 
