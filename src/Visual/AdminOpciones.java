@@ -7,6 +7,7 @@ package Visual;
 
 import Controladores.EmpleadosJpaController;
 import Controladores.ProductosJpaController;
+import Controladores.UsuariosJpaController;
 import Controladores.exceptions.IllegalOrphanException;
 import Controladores.exceptions.NonexistentEntityException;
 import Entidades.Empleados;
@@ -17,8 +18,14 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -30,8 +37,22 @@ import javax.swing.table.DefaultTableModel;
 public class AdminOpciones extends javax.swing.JFrame {
 
     private final EmpleadosJpaController empCon = new EmpleadosJpaController();
-    private final Empleados emp = new Empleados();
+    private Empleados emp = new Empleados();
     private final ProductosJpaController mercanciaCon = new ProductosJpaController();
+    private Usuarios us = new Usuarios();
+    private final UsuariosJpaController usCon = new UsuariosJpaController();
+    private static String idSesion;
+    private static boolean result;
+
+    public static String getIdSesion() {
+        return idSesion;
+    }
+
+    public static void setIdSesion(String idSesion) {
+        AdminOpciones.idSesion = idSesion;
+    }
+
+    
     
     public DefaultTableModel cargarTablaEmpleados (JTable tabla){
         
@@ -75,6 +96,43 @@ public class AdminOpciones extends javax.swing.JFrame {
         
     }
     
+    public DefaultTableModel cargarTablaUsuarios (JTable tabla){
+        
+        limpiarTablaUsuarios();
+        
+        UsuariosJpaController usuario = new UsuariosJpaController();
+        DefaultTableModel model = (DefaultTableModel) tabla.getModel();
+        List<Usuarios> lista = new LinkedList();
+        lista = usuario.findUsuariosEntities();
+        
+        for (int i = 0; i < lista.size(); i++) {
+           
+         
+	 Object[] datosRegistro
+
+			 = {
+
+	lista.get(i).getIdEmp().getId(),
+                             
+        lista.get(i).getIdEmp().getNombre(),
+
+	lista.get(i).getIdUsuario(),
+
+	lista.get(i).getNivel()
+
+	
+};
+
+	
+
+        model.addRow(datosRegistro);
+        
+        }
+
+	return model;
+        
+    }
+    
     public void limpiarTablaEmpleados(){
         
         jtEmpleados.setModel(new javax.swing.table.DefaultTableModel(
@@ -95,9 +153,17 @@ public class AdminOpciones extends javax.swing.JFrame {
 
             },
             new String [] {
-                "ID de empleado", "Nombre de empleado", "Contraseña", "ID de usuario", "Nivel de acceso"
+                "ID de empleado", "Nombre de empleado", "ID de usuario", "Nivel de acceso"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         
     }
     
@@ -112,10 +178,18 @@ public class AdminOpciones extends javax.swing.JFrame {
         btnEliminar.setEnabled(false);
     }
     
+    public void mostrar(int status){
+        if(status == 1){
+            passContraU.setEchoChar((char)(0));
+            result = true;
+        }
+    }
+    
     
     public AdminOpciones() {
         initComponents();
         cargarTablaEmpleados(jtEmpleados);
+        cargarTablaUsuarios(jtUsuarios);
     }
 
     /**
@@ -140,9 +214,9 @@ public class AdminOpciones extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         jtUsuarios = new javax.swing.JTable();
         jLabel11 = new javax.swing.JLabel();
-        txtContraU = new javax.swing.JTextField();
         btnMostrar = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        btnEditarContra = new javax.swing.JButton();
+        passContraU = new javax.swing.JPasswordField();
         jpEmpleados = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -180,63 +254,71 @@ public class AdminOpciones extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(670, 570));
+        setPreferredSize(new java.awt.Dimension(690, 610));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jpUsuarios.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        jTabbedPane1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTabbedPane1MouseClicked(evt);
+            }
+        });
+
+        jpUsuarios.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                jpUsuariosMouseExited(evt);
+            }
+        });
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel6.setText("Nombre del empleado:");
-        jpUsuarios.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(29, 341, -1, -1));
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel7.setText("ID de usuario:");
-        jpUsuarios.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(364, 303, -1, -1));
 
         jLabel9.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel9.setText("ID de empleado");
-        jpUsuarios.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(29, 303, -1, -1));
 
         jLabel10.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel10.setText("Nivel de acceso:");
-        jpUsuarios.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(364, 341, -1, -1));
 
         txtNombreU.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtNombreU.setEnabled(false);
-        jpUsuarios.add(txtNombreU, new org.netbeans.lib.awtextra.AbsoluteConstraints(185, 341, 119, -1));
 
         txtNivelUsuario.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtNivelUsuario.setToolTipText("");
         txtNivelUsuario.setEnabled(false);
-        jpUsuarios.add(txtNivelUsuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(495, 341, 119, -1));
 
         txtIDusuario.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtIDusuario.setEnabled(false);
-        jpUsuarios.add(txtIDusuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(495, 303, 119, -1));
 
         txtIDempleado.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtIDempleado.setEnabled(false);
-        jpUsuarios.add(txtIDempleado, new org.netbeans.lib.awtextra.AbsoluteConstraints(185, 303, 119, -1));
 
         jtUsuarios.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "ID de empleado", "Nombre de empleado", "Contraseña", "ID de usuario", "Nivel de acceso"
+                "ID de empleado", "Nombre de empleado", "ID de usuario", "Nivel de acceso"
             }
-        ));
-        jScrollPane2.setViewportView(jtUsuarios);
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
 
-        jpUsuarios.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(29, 37, 585, 235));
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jtUsuarios.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jtUsuariosMouseClicked(evt);
+            }
+        });
+        jScrollPane2.setViewportView(jtUsuarios);
 
         jLabel11.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel11.setText("Contraseña:");
-        jpUsuarios.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(29, 380, -1, -1));
-
-        txtContraU.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtContraU.setEnabled(false);
-        jpUsuarios.add(txtContraU, new org.netbeans.lib.awtextra.AbsoluteConstraints(185, 380, 119, -1));
 
         btnMostrar.setText("Mostrar contraseña");
         btnMostrar.setEnabled(false);
@@ -245,14 +327,85 @@ public class AdminOpciones extends javax.swing.JFrame {
                 btnMostrarActionPerformed(evt);
             }
         });
-        jpUsuarios.add(btnMostrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(364, 379, -1, -1));
 
-        jButton1.setText("Editar contraseña");
-        jButton1.setEnabled(false);
-        jpUsuarios.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(497, 379, -1, -1));
+        btnEditarContra.setText("Editar contraseña");
+        btnEditarContra.setEnabled(false);
+
+        passContraU.setEditable(false);
+        passContraU.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+
+        javax.swing.GroupLayout jpUsuariosLayout = new javax.swing.GroupLayout(jpUsuarios);
+        jpUsuarios.setLayout(jpUsuariosLayout);
+        jpUsuariosLayout.setHorizontalGroup(
+            jpUsuariosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpUsuariosLayout.createSequentialGroup()
+                .addGap(29, 29, 29)
+                .addGroup(jpUsuariosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 585, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jpUsuariosLayout.createSequentialGroup()
+                        .addComponent(jLabel9)
+                        .addGap(60, 60, 60)
+                        .addComponent(txtIDempleado, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(60, 60, 60)
+                        .addComponent(jLabel7)
+                        .addGap(45, 45, 45)
+                        .addComponent(txtIDusuario, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jpUsuariosLayout.createSequentialGroup()
+                        .addGroup(jpUsuariosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel6)
+                            .addComponent(jLabel11))
+                        .addGap(18, 18, 18)
+                        .addGroup(jpUsuariosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(passContraU, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
+                            .addComponent(txtNombreU))
+                        .addGap(60, 60, 60)
+                        .addGroup(jpUsuariosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jpUsuariosLayout.createSequentialGroup()
+                                .addComponent(jLabel10)
+                                .addGap(33, 33, 33)
+                                .addComponent(txtNivelUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpUsuariosLayout.createSequentialGroup()
+                                .addComponent(btnMostrar)
+                                .addGap(6, 6, 6)
+                                .addComponent(btnEditarContra))))))
+        );
+        jpUsuariosLayout.setVerticalGroup(
+            jpUsuariosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpUsuariosLayout.createSequentialGroup()
+                .addGap(37, 37, 37)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(31, 31, 31)
+                .addGroup(jpUsuariosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel9)
+                    .addComponent(txtIDempleado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel7)
+                    .addComponent(txtIDusuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jpUsuariosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel6)
+                    .addComponent(txtNombreU, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel10)
+                    .addComponent(txtNivelUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jpUsuariosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnMostrar)
+                    .addComponent(btnEditarContra)
+                    .addGroup(jpUsuariosLayout.createSequentialGroup()
+                        .addGap(1, 1, 1)
+                        .addComponent(jLabel11))
+                    .addComponent(passContraU, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        );
 
         jTabbedPane1.addTab("Usuarios", jpUsuarios);
 
+        jpEmpleados.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jpEmpleadosMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                jpEmpleadosMouseEntered(evt);
+            }
+        });
         jpEmpleados.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -399,7 +552,7 @@ public class AdminOpciones extends javax.swing.JFrame {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(95, Short.MAX_VALUE)
+                .addContainerGap(126, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(177, 177, 177)
@@ -465,12 +618,12 @@ public class AdminOpciones extends javax.swing.JFrame {
                     .addComponent(jLabel16))
                 .addGap(32, 32, 32)
                 .addComponent(btnRegistrar)
-                .addContainerGap(62, Short.MAX_VALUE))
+                .addContainerGap(97, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Alta de productos", jPanel2);
 
-        getContentPane().add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 100, -1, -1));
+        getContentPane().add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 100, 650, 470));
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
         jLabel1.setText("interDeportes");
@@ -505,7 +658,6 @@ public class AdminOpciones extends javax.swing.JFrame {
 
     private void jtEmpleadosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jtEmpleadosMouseClicked
         int id = (int)(jtEmpleados.getValueAt(jtEmpleados.getSelectedRow(), 0));
-
         txtNombre.setText(empCon.findEmpleados(id).getNombre());
         dcFecha.setDate(empCon.findEmpleados(id).getNacimiento());
         String seccion = (empCon.findEmpleados(id).getSexo().equals('M'))?"Masculino":"Femenino";
@@ -538,8 +690,10 @@ public class AdminOpciones extends javax.swing.JFrame {
         emp.setSexo(seccion);
         emp.setPuesto(cmbPuesto.getSelectedItem().toString());
         List<Empleados> lista = empCon.findEmpleadosEntities();
+ 
         try {
             empCon.edit(emp);
+            
         } catch (NonexistentEntityException ex) {
             Logger.getLogger(RegistroEmpleados.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {
@@ -577,7 +731,10 @@ public class AdminOpciones extends javax.swing.JFrame {
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void btnMostrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMostrarActionPerformed
-        // TODO add your handling code here:
+        new Autenticacion(this, rootPaneCheckingEnabled).setVisible(true);
+        if(result){
+            passContraU.setEchoChar((char)0);
+        }
     }//GEN-LAST:event_btnMostrarActionPerformed
 
     private void cmbPuestoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbPuestoActionPerformed
@@ -634,6 +791,45 @@ public class AdminOpciones extends javax.swing.JFrame {
 
     }//GEN-LAST:event_btnRegistrarActionPerformed
 
+    private void jtUsuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jtUsuariosMouseClicked
+        int fila = jtUsuarios.getSelectedRow();
+        
+        us = usCon.findUsuarios(jtUsuarios.getValueAt(fila, 2).toString());
+        txtIDempleado.setText(us.getIdEmp().getId().toString());
+        txtNombreU.setText(us.getIdEmp().getNombre());
+        passContraU.setText(us.getContra());
+        txtIDusuario.setText(us.getIdUsuario());
+        txtNivelUsuario.setText(String.valueOf(us.getNivel()));
+        
+        btnMostrar.setEnabled(true);
+        btnEditarContra.setEnabled(true);
+    }//GEN-LAST:event_jtUsuariosMouseClicked
+
+    private void jTabbedPane1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTabbedPane1MouseClicked
+        
+    }//GEN-LAST:event_jTabbedPane1MouseClicked
+
+    private void jpEmpleadosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jpEmpleadosMouseClicked
+        
+    }//GEN-LAST:event_jpEmpleadosMouseClicked
+
+    private void jpEmpleadosMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jpEmpleadosMouseEntered
+        
+    }//GEN-LAST:event_jpEmpleadosMouseEntered
+
+    private void jpUsuariosMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jpUsuariosMouseExited
+        Timer tiempo = new Timer();
+        TimerTask tarea = new TimerTask() {
+            @Override
+            public void run() {
+                passContraU.setEchoChar('*');
+                tiempo.cancel();
+            }
+        };
+        tiempo.schedule(tarea, 10000, 1);
+        
+    }//GEN-LAST:event_jpUsuariosMouseExited
+
     /**
      * @param args the command line arguments
      */
@@ -675,6 +871,7 @@ public class AdminOpciones extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAnadir;
     private javax.swing.JButton btnEditar;
+    private javax.swing.JButton btnEditarContra;
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnMostrar;
     private javax.swing.JButton btnRegistrar;
@@ -683,7 +880,6 @@ public class AdminOpciones extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> cmbSeccion;
     private javax.swing.JComboBox<String> cmbTipoProducto;
     private com.toedter.calendar.JDateChooser dcFecha;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -711,11 +907,11 @@ public class AdminOpciones extends javax.swing.JFrame {
     private javax.swing.JPanel jpUsuarios;
     private javax.swing.JTable jtEmpleados;
     private javax.swing.JTable jtUsuarios;
+    private javax.swing.JPasswordField passContraU;
     private javax.swing.JRadioButton radFem;
     private javax.swing.JRadioButton radMas;
     private javax.swing.JTextField txtCantidad;
     private javax.swing.JTextField txtColor;
-    private javax.swing.JTextField txtContraU;
     private javax.swing.JTextField txtIDempleado;
     private javax.swing.JTextField txtIDproducto;
     private javax.swing.JTextField txtIDusuario;

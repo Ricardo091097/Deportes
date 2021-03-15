@@ -15,7 +15,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import Entidades.Empleados;
 import Entidades.Usuarios;
-import com.mysql.cj.PerConnectionLRUFactory;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -31,10 +30,12 @@ public class UsuariosJpaController implements Serializable {
     public UsuariosJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
-    
+
     public UsuariosJpaController() {
         this.emf = Persistence.createEntityManagerFactory("DeportesPU");
     }
+    
+    
     
     private EntityManagerFactory emf = null;
 
