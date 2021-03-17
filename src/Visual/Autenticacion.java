@@ -78,6 +78,7 @@ public class Autenticacion extends javax.swing.JDialog {
                 closeDialog(evt);
             }
         });
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         okButton.setText("OK");
         okButton.addActionListener(new java.awt.event.ActionListener() {
@@ -85,6 +86,8 @@ public class Autenticacion extends javax.swing.JDialog {
                 okButtonActionPerformed(evt);
             }
         });
+        getContentPane().add(okButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(93, 171, 75, -1));
+        getRootPane().setDefaultButton(okButton);
 
         cancelButton.setText("Cancelar");
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
@@ -92,54 +95,19 @@ public class Autenticacion extends javax.swing.JDialog {
                 cancelButtonActionPerformed(evt);
             }
         });
+        getContentPane().add(cancelButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 171, -1, -1));
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
         jLabel1.setText("Debes ingresar tu contraseña de usuario para esta acción");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, -1, -1));
 
         labelError.setForeground(new java.awt.Color(255, 0, 0));
         labelError.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         labelError.setText("Contraseña incorrecta");
+        getContentPane().add(labelError, new org.netbeans.lib.awtextra.AbsoluteConstraints(137, 131, 151, -1));
 
         passAuth.setPreferredSize(new java.awt.Dimension(151, 20));
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel1))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(93, 93, 93)
-                        .addComponent(okButton, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(82, 82, 82)
-                        .addComponent(cancelButton))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(137, 137, 137)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(labelError, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(passAuth, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addContainerGap(18, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(40, 40, 40)
-                .addComponent(jLabel1)
-                .addGap(40, 40, 40)
-                .addComponent(passAuth, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(labelError)
-                .addGap(26, 26, 26)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(okButton)
-                    .addComponent(cancelButton))
-                .addGap(33, 33, 33))
-        );
-
-        getRootPane().setDefaultButton(okButton);
+        getContentPane().add(passAuth, new org.netbeans.lib.awtextra.AbsoluteConstraints(137, 100, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
