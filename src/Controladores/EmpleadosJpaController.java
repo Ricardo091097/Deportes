@@ -75,7 +75,6 @@ public class EmpleadosJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            empleados = em.merge(empleados);
             Empleados persistentEmpleados = em.find(Empleados.class, empleados.getId());
             Usuarios usuariosOld = persistentEmpleados.getUsuarios();
             Usuarios usuariosNew = empleados.getUsuarios();
@@ -93,7 +92,7 @@ public class EmpleadosJpaController implements Serializable {
                 usuariosNew = em.getReference(usuariosNew.getClass(), usuariosNew.getIdUsuario());
                 empleados.setUsuarios(usuariosNew);
             }
-            
+            empleados = em.merge(empleados);
             if (usuariosNew != null && !usuariosNew.equals(usuariosOld)) {
                 Empleados oldIdEmpOfUsuarios = usuariosNew.getIdEmp();
                 if (oldIdEmpOfUsuarios != null) {

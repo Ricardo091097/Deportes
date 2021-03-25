@@ -139,18 +139,24 @@ public class Login extends javax.swing.JFrame {
         String id = txtUsuario.getText();
         String pass = txtContrasena.getText();
         String nombre = null;
+        String puesto = null;
         boolean resultado = false;
         for (Usuarios fila: datos) {
             if(fila.getIdUsuario().equals(id)&&fila.getContra().equals(pass)){
                 resultado = true;
                 nombre = fila.getIdEmp().getNombre();
+                puesto = fila.getIdEmp().getPuesto();
                 break;
             }
         }
         if(resultado){
             JOptionPane.showMessageDialog(this, "Bienvenido "+nombre);
-            new AdminOpciones().setVisible(true);
-            AdminOpciones.setIdSesion(id);
+            if(puesto.equals("Administrador")){
+                new AdminOpciones().setVisible(true);
+                AdminOpciones.setIdSesion(id);
+            }else{
+                new PuntoVenta().setVisible(true);
+            }
             this.dispose();
         }else{
             JOptionPane.showMessageDialog(this, "Datos incorrectos");

@@ -9,6 +9,8 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -23,10 +25,10 @@ import javax.persistence.Table;
 @NamedQueries({
     @NamedQuery(name = "Productos.findAll", query = "SELECT p FROM Productos p"),
     @NamedQuery(name = "Productos.findById", query = "SELECT p FROM Productos p WHERE p.id = :id"),
+    @NamedQuery(name = "Productos.findByNombre", query = "SELECT p FROM Productos p WHERE p.nombre = :nombre"),
     @NamedQuery(name = "Productos.findBySeccion", query = "SELECT p FROM Productos p WHERE p.seccion = :seccion"),
     @NamedQuery(name = "Productos.findByCategoria", query = "SELECT p FROM Productos p WHERE p.categoria = :categoria"),
     @NamedQuery(name = "Productos.findByMarca", query = "SELECT p FROM Productos p WHERE p.marca = :marca"),
-    @NamedQuery(name = "Productos.findByNombre", query = "SELECT p FROM Productos p WHERE p.nombre = :nombre"),
     @NamedQuery(name = "Productos.findByColor", query = "SELECT p FROM Productos p WHERE p.color = :color"),
     @NamedQuery(name = "Productos.findByPrecio", query = "SELECT p FROM Productos p WHERE p.precio = :precio"),
     @NamedQuery(name = "Productos.findByCantidad", query = "SELECT p FROM Productos p WHERE p.cantidad = :cantidad")})
@@ -34,9 +36,13 @@ public class Productos implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "ID")
-    private String id;
+    private Integer id;
+    @Basic(optional = false)
+    @Column(name = "Nombre")
+    private String nombre;
     @Basic(optional = false)
     @Column(name = "Seccion")
     private Character seccion;
@@ -46,9 +52,6 @@ public class Productos implements Serializable {
     @Basic(optional = false)
     @Column(name = "Marca")
     private String marca;
-    @Basic(optional = false)
-    @Column(name = "Nombre")
-    private String nombre;
     @Basic(optional = false)
     @Column(name = "Color")
     private String color;
@@ -62,27 +65,35 @@ public class Productos implements Serializable {
     public Productos() {
     }
 
-    public Productos(String id) {
+    public Productos(Integer id) {
         this.id = id;
     }
 
-    public Productos(String id, Character seccion, String categoria, String marca, String nombre, String color, float precio, int cantidad) {
+    public Productos(Integer id, String nombre, Character seccion, String categoria, String marca, String color, float precio, int cantidad) {
         this.id = id;
+        this.nombre = nombre;
         this.seccion = seccion;
         this.categoria = categoria;
         this.marca = marca;
-        this.nombre = nombre;
         this.color = color;
         this.precio = precio;
         this.cantidad = cantidad;
     }
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
     public Character getSeccion() {
@@ -107,14 +118,6 @@ public class Productos implements Serializable {
 
     public void setMarca(String marca) {
         this.marca = marca;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
     }
 
     public String getColor() {

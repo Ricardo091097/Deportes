@@ -4,7 +4,10 @@
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <class>Entidades.Empleados</class>
     <class>Entidades.Usuarios</class>
+    <class>Entidades.Ventas</class>
+    <class>Entidades.DetallesVenta</class>
     <class>Entidades.Productos</class>
+    <class>Entidades.Provedores</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/interdeportes?zeroDateTimeBehavior=CONVERT_TO_NULL"/>
       <property name="javax.persistence.jdbc.user" value="root"/>

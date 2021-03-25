@@ -6,13 +6,16 @@
 package Entidades;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -28,6 +31,9 @@ import javax.persistence.Table;
     @NamedQuery(name = "Usuarios.findByContra", query = "SELECT u FROM Usuarios u WHERE u.contra = :contra"),
     @NamedQuery(name = "Usuarios.findByNivel", query = "SELECT u FROM Usuarios u WHERE u.nivel = :nivel")})
 public class Usuarios implements Serializable {
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idVendedor")
+    private List<Ventas> ventasList;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -112,6 +118,14 @@ public class Usuarios implements Serializable {
     @Override
     public String toString() {
         return "Entidades.Usuarios[ idUsuario=" + idUsuario + " ]";
+    }
+
+    public List<Ventas> getVentasList() {
+        return ventasList;
+    }
+
+    public void setVentasList(List<Ventas> ventasList) {
+        this.ventasList = ventasList;
     }
     
 }
