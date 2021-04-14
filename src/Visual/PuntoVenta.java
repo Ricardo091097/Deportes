@@ -6,12 +6,21 @@
 package Visual;
 
 
+import Controladores.DetallesVentaJpaController;
 import Controladores.ProductosJpaController;
+import Controladores.VentasJpaController;
+import Entidades.DetallesVenta;
+import Entidades.DetallesVentaPK;
 import Entidades.Empleados;
 import Entidades.Productos;
+import Entidades.Usuarios;
+import Entidades.Ventas;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
@@ -29,6 +38,16 @@ public class PuntoVenta extends javax.swing.JFrame {
     
     private Productos temp = new Productos();
     public LinkedList<Productos> listaProductos = new LinkedList<>();
+    private static Usuarios usuario = new Usuarios();
+
+    public static Usuarios getUsuario() {
+        return usuario;
+    }
+
+    public static void setUsuario(Usuarios usuario) {
+        PuntoVenta.usuario = usuario;
+    }
+    
     
     public void cargarTablaBusqueda(){
         
@@ -151,29 +170,48 @@ public class PuntoVenta extends javax.swing.JFrame {
         jtVentas.setModel(model);
     }
     
+    public void limpiarTablaVentas(){
+        jtVentas.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "Nombre", "Marca", "Color", "Precio unitario", "Cantidad"
+            }
+        ));
+    }
+    
     public String agregarCanasta(int index, int sol) throws Exception{
         if(listaProductos.isEmpty()){
             listaProductos.addAll(new ProductosJpaController().findProductosEntities());
-            System.out.println("hoña");
+            
         }
         String mensaje = null;
         Productos producto = listaProductos.get(index);
         int can = producto.getCantidad();
-        if(can<sol){
+        if(sol<=0){
+            mensaje = "Ingrese la cantidad que desea añadir";
+        }else{
+            if(can<sol){
             mensaje = "Insuficientes articulos en existencia para completar la solicitud";
         }else{
-            producto.setCantidad((can-sol));
-            listaProductos.set(index, producto);
             producto.setCantidad(sol);
             agregarTablaVentas(producto);
+            producto.setCantidad((can-sol));
+            listaProductos.set(index, producto);
+            
+            
             mensaje = "Añadido a la canasta";
         }
+        }
+        
         return mensaje;
     }
     
     public PuntoVenta() {
         initComponents();
         cargarTablaBusqueda();
+        
         
     }
 
@@ -258,7 +296,7 @@ public class PuntoVenta extends javax.swing.JFrame {
 
         jtVentas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null}
+
             },
             new String [] {
                 "ID", "Nombre", "Marca", "Color", "Precio unitario", "Cantidad"
@@ -269,6 +307,7 @@ public class PuntoVenta extends javax.swing.JFrame {
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel5.setText("Venta total:");
 
+        txtTotalVentas.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtTotalVentas.setText("0");
 
         btnAnadir.setText("Añadir");
@@ -460,13 +499,34 @@ public class PuntoVenta extends javax.swing.JFrame {
     }//GEN-LAST:event_txtVentaIDActionPerformed
 
     private void btnAnadirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnadirActionPerformed
-        int solicitud = Integer.parseInt(txtCantidadVenta.getText());
-        int index = new ProductosJpaController().findProductosEntities().indexOf(temp);
-        try {
-            JOptionPane.showMessageDialog(this, agregarCanasta(index,solicitud));
-        } catch (Exception ex) {
-            Logger.getLogger(PuntoVenta.class.getName()).log(Level.SEVERE, null, ex);
+        boolean borrar = true;
+        if(txtCantidadVenta.getText().equals("")){
+            JOptionPane.showMessageDialog(this, "Debe ingresar alguna cantidad.");
+            borrar = false;
+        }else{
+            int solicitud = Integer.parseInt(txtCantidadVenta.getText());
+            int index = new ProductosJpaController().findProductosEntities().indexOf(temp);
+            try {
+                JOptionPane.showMessageDialog(this, agregarCanasta(index,solicitud));
+            } catch (Exception ex) {
+                Logger.getLogger(PuntoVenta.class.getName()).log(Level.SEVERE, null, ex);
+                borrar = false;
+            }
         }
+        if(borrar){
+            txtCantidadVenta.setText("");
+            txtVentaID.setText("");
+            float total = 0;
+            float fila = 0;
+            
+            for (int i = 0; i < jtVentas.getRowCount(); i++) {
+                fila = (Float.parseFloat(jtVentas.getValueAt(i,4).toString()))*(Float.parseFloat(jtVentas.getValueAt(i,5).toString()));
+                total += fila;
+            }
+            
+            txtTotalVentas.setText(String.valueOf(total));
+        }
+        
             
     }//GEN-LAST:event_btnAnadirActionPerformed
 
@@ -479,39 +539,99 @@ public class PuntoVenta extends javax.swing.JFrame {
 //        Tomar todos los datos de la venta necesarios
         
 //        Usar los datos de la venta para ingrearlos en un metodo que los lleve a la capa de negocios
-//        int totalVenta = Integer.parseInt(txtTotalVentas.getText());
-//        
-//        if(venta.FinalizarVenta(totalVenta)==true){
-//            JOptionPane.showMessageDialog(this, "Venta realizada");
-//            
-//            txtBusquedaNombre.setText("");
-//            txtCantidadVenta.setText("");
-//            txtTotalVentas.setText("0");
-//            txtVentaID.setText("");
-//            
-//            btnLimpiar.doClick();
-//            
-//            jtVentas.setModel(new javax.swing.table.DefaultTableModel(
-//            new Object [][] {
-//                {null, null, null, null, null}
-//            },
-//            new String [] {
-//                "Nombre", "Marca", "Color", "Precio unitario", "Cantidad"
-//            }
-//        ));
-//            
-//            
-//            
-//        }else{
-//            JOptionPane.showMessageDialog(this, "Error finalizando la venta");
-//        }
+        float totalVenta = Float.parseFloat(txtTotalVentas.getText());
+        VentasJpaController conVenta = new VentasJpaController();
+        ProductosJpaController proCon = new ProductosJpaController();
+        Usuarios ven = getUsuario().getIdEmp().getUsuarios();
+        Ventas venta = new Ventas();
+        venta.setTotal(totalVenta);
+        venta.setIdVendedor(ven);
+        boolean resultado = true;
+        ArrayList<Integer> idProductos = new ArrayList();
+        ArrayList<Integer> cantidades = new ArrayList();
+        int cantidad = 0;
+        int id = 0;
+        for (int i = 0; i <= jtVentas.getRowCount(); i++) {
+            if (jtVentas.getRowCount()==i) {
+                cantidades.add(cantidad);
+            }else{
+                if((i==0)&&(jtVentas.getRowCount()>1)){
+                    cantidad = (int)jtVentas.getValueAt(i, 5);
+                }else{
+                    if(id ==(Integer.valueOf(jtVentas.getValueAt(i, 0).toString()))){
+                        cantidad += (int)jtVentas.getValueAt(i, 5);
+                    }else{
+                        cantidades.add(cantidad);
+                        cantidad = (int)jtVentas.getValueAt(i, 5);
+                    }
+                }
+                
+                id = Integer.valueOf(jtVentas.getValueAt(i, 0).toString());
+                Productos producto = new ProductosJpaController().findProductos(id);
+                idProductos.add(id);
+                int cantidadPrevia = producto.getCantidad();
+                int nuevaCantidad = cantidadPrevia - ((int)jtVentas.getValueAt(i, 5));
+                producto.setCantidad(nuevaCantidad);
+
+                try {
+                    proCon.edit(producto);
+                } catch (Exception ex) {
+                    Logger.getLogger(PuntoVenta.class.getName()).log(Level.SEVERE, null, ex);
+                    resultado = false;
+                    break;
+                }
+                
+            }
+            
+            
+        }
+        if (resultado) {
+            try {
+                conVenta.create(venta);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Error al realizar la venta");
+                resultado = false;
+            }
+        }
+        
+        if (resultado) {
+            DetallesVentaJpaController detCon = new DetallesVentaJpaController();
+            
+            Set<Integer> hashSet = new HashSet<Integer>(idProductos);
+            idProductos.clear();
+            idProductos.addAll(hashSet);
+            
+            List<Ventas> infoVentas = new VentasJpaController().findVentasEntities();
+            int idVenta = infoVentas.get(infoVentas.size()-1).getNoVenta();
+            int contador = 0;
+            for (Integer idActual : idProductos) {
+                DetallesVentaPK dvpk = new DetallesVentaPK(idVenta, idActual);
+                float precio = new ProductosJpaController().findProductos(idActual).getPrecio();
+                DetallesVenta detalle = new DetallesVenta(dvpk, precio, cantidades.get(contador));
+                detalle.setVentas(new VentasJpaController().findVentas(idVenta));
+                detalle.setProductos(new ProductosJpaController().findProductos(idActual));
+                try {
+                    detCon.create(detalle);
+                } catch (Exception ex) {
+                    Logger.getLogger(PuntoVenta.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                contador++;
+            }
+            
+            JOptionPane.showMessageDialog(this, "Venta finalizada");
+            txtTotalVentas.setText("");
+            limpiarTablaVentas();
+            cargarTablaBusqueda();
+        }
+        
         
 //        Metodo que solicite datos de la venta para mandarlos a la capa de negocios
         
     }//GEN-LAST:event_btnFinalizarActionPerformed
 
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
-        System.exit(0);
+        new Login().setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_btnSalirActionPerformed
 
     private void jtBusquedaExMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jtBusquedaExMouseClicked

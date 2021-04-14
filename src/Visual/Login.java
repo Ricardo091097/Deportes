@@ -146,6 +146,7 @@ public class Login extends javax.swing.JFrame {
                 resultado = true;
                 nombre = fila.getIdEmp().getNombre();
                 puesto = fila.getIdEmp().getPuesto();
+                PuntoVenta.setUsuario(fila);
                 break;
             }
         }
@@ -155,6 +156,7 @@ public class Login extends javax.swing.JFrame {
                 new AdminOpciones().setVisible(true);
                 AdminOpciones.setIdSesion(id);
             }else{
+                
                 new PuntoVenta().setVisible(true);
             }
             this.dispose();
